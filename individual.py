@@ -37,17 +37,21 @@ class Individual:
             list: Lista de ações geradas (índice da ação e duração).
         """
         actions = []
+        previous_action_was_jump = False
+
         for _ in range(5000):
-            action = random.choices([0, 1, 2], weights=[1, 2, 1])[0]
-            duration = random.randint(1, 10)
+            if previous_action_was_jump:
+                # Aumenta a probabilidade de mover para a direita após um pulo
+                action = random.choices([0, 1, 2], weights=[1, 5, 1])[0]
+            else:
+                action = random.choices([0, 1, 2], weights=[1, 2, 1])[0]
 
             if action == 2:
-                if environment and self.detect_large_obstacle(environment):
-                    if random.random() < 0.5:
-                        duration = random.randint(5, 15)
-                else:
-                    if random.random() < 0.2:
-                        duration = random.randint(5, 15)
+                duration = random.randint(30, 50)  # Maior duração para pulos
+                previous_action_was_jump = True
+            else:
+                duration = random.randint(1, 5)  # Menor duração para outros movimentos
+                previous_action_was_jump = False
 
             actions.append((action, duration))
         return actions
@@ -91,7 +95,7 @@ class Individual:
         Returns:
             bool: True se houver um obstáculo grande, False caso contrário.
         """
-        # Exemplo simplificado: Detecta obstáculos grandes baseados em lógica do ambiente
+        # simplificado: Detecta obstáculos grandes baseados em lógica do ambiente
         return environment.detect_large_obstacle()
 
     def set_actions(self, actions):
